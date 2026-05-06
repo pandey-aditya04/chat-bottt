@@ -36,6 +36,10 @@ app.get('/api/health', (req, res) => {
   })
 })
 
+// Public widget endpoints — must allow any origin
+app.use('/api/chat', cors({ origin: '*' }));
+app.use('/api/bots/:botId/public', cors({ origin: '*' }));
+
 // Routes
 app.use('/api/auth', require('./routes/auth'));
 app.use('/api/bots', require('./routes/bot'));
