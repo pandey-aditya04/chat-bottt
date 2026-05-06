@@ -13,6 +13,7 @@ const mapToSnakeCase = (data) => ({
   fallback_message: data.fallbackMessage || data.fallback_message,
   chat_position: data.chatPosition || data.chat_position || 'Right',
   launcher_icon: data.launcherIcon || data.launcher_icon || 'Chat Bubble',
+  chat_window_title: data.chatWindowTitle || data.chat_window_title || data.name || 'Chat',
   max_response_length: data.maxResponseLength || data.max_response_length || 'Medium',
   status: data.status || 'Active'
 });
