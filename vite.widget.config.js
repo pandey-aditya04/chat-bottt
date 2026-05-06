@@ -10,7 +10,7 @@ export default defineConfig({
     lib: {
       entry: 'src/widget/embed.js',
       name: 'ChatBotWidget',
-      fileName: () => 'widget',
+      fileName: () => 'widget.js',
       formats: ['iife']
     },
     outDir: 'dist-widget',
