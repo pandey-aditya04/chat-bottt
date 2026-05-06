@@ -18,7 +18,7 @@ app.use(helmet());
 app.use(morgan('dev'));
 
 // CORS configuration
-app.options('*', cors({ origin: '*' })); // Handle all preflight requests
+app.options('/(.*)', cors({ origin: '*' })); // Handle all preflight requests
 app.use(cors({
   origin: function(origin, callback) {
     callback(null, true); // Allow all origins (needed for widget embeds)
