@@ -16,11 +16,13 @@ console.log('JWT:', !!process.env.JWT_SECRET);
 // Middleware
 app.use(helmet());
 app.use(morgan('dev'));
+
+// CORS configuration
+app.options('*', cors({ origin: '*' })); // Handle all preflight requests
 app.use(cors({
-  origin: [
-    'https://chat-bottt-dusky.vercel.app',
-    'http://localhost:5173'
-  ],
+  origin: function(origin, callback) {
+    callback(null, true); // Allow all origins (needed for widget embeds)
+  },
   credentials: true
 }));
 app.use(express.json());
