@@ -3,14 +3,12 @@ const router = express.Router();
 const { GoogleGenerativeAI } = require('@google/generative-ai');
 const { supabase } = require('../config/supabase');
 
-// POST /api/chat - Regular chat interaction
 router.post('/', async (req, res) => {
   try {
     const { botId, query, messages, sessionId } = req.body;
 
     if (!botId) return res.status(400).json({ error: 'botId is required' });
 
-    // 1. Fetch bot configuration
     const { data: bot, error: botError } = await supabase
       .from('bots')
       .select('*, faqs(*)')
@@ -19,7 +17,6 @@ router.post('/', async (req, res) => {
 
     if (botError || !bot) return res.status(404).json({ error: 'Bot not found' });
 
-    // 2. Build system prompt
     const faqContext = bot.faqs?.map(f => `Q: ${f.question}\nA: ${f.answer}`).join('\n\n') || '';
 
     const systemPrompt = `
@@ -50,26 +47,30 @@ router.post('/', async (req, res) => {
       - Don't mention you are an AI model.
     `;
 
-    // 3. Check Gemini API Key
     if (!process.env.GEMINI_API_KEY) {
       console.error('GEMINI_API_KEY is not set!');
       return res.status(500).json({ error: 'AI service not configured on server' });
     }
 
-    // 4. Call Gemini
     const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
     const model = genAI.getGenerativeModel({ 
       model: 'gemini-flash-latest',
       systemInstruction: systemPrompt
     });
 
-    // Convert messages to Gemini history format if provided
     let history = [];
     if (messages && Array.isArray(messages)) {
-      history = messages.filter(m => m.role && (m.content || m.text)).slice(0, -1).map(m => ({
-        role: m.role === 'assistant' || m.role === 'bot' ? 'model' : 'user',
-        parts: [{ text: m.content || m.text }]
-      }));
+      history = messages
+        .filter(m => m.role && (m.content || m.text))
+        .slice(0, -1)
+        .map(m => ({
+          role: m.role === 'assistant' || m.role === 'bot' ? 'model' : 'user',
+          parts: [{ text: m.content || m.text }]
+        }));
+
+      // ✅ FIX: Gemini requires history to start with 'user'
+      const firstUserIdx = history.findIndex(m => m.role === 'user');
+      history = firstUserIdx >= 0 ? history.slice(firstUserIdx) : [];
     }
 
     const chat = model.startChat({ history });
@@ -79,10 +80,8 @@ router.post('/', async (req, res) => {
 
     const result = await chat.sendMessage(userQuery);
     const responseText = result.response.text();
-
     const timestamp = new Date().toLocaleTimeString();
     
-    // 5. Update Stats & Logs (Non-blocking)
     if (sessionId) {
       (async () => {
         try {
@@ -111,7 +110,6 @@ router.post('/', async (req, res) => {
   }
 });
 
-// POST /api/chat/demo - Demo chat interaction (no botId required)
 router.post('/demo', async (req, res) => {
   try {
     const { query, messages } = req.body;
@@ -138,10 +136,17 @@ router.post('/demo', async (req, res) => {
 
     let history = [];
     if (messages && Array.isArray(messages)) {
-      history = messages.filter(m => m.role && (m.content || m.text)).slice(0, -1).map(m => ({
-        role: m.role === 'assistant' || m.role === 'bot' ? 'model' : 'user',
-        parts: [{ text: m.content || m.text }]
-      }));
+      history = messages
+        .filter(m => m.role && (m.content || m.text))
+        .slice(0, -1)
+        .map(m => ({
+          role: m.role === 'assistant' || m.role === 'bot' ? 'model' : 'user',
+          parts: [{ text: m.content || m.text }]
+        }));
+
+      // ✅ FIX: Gemini requires history to start with 'user'
+      const firstUserIdx = history.findIndex(m => m.role === 'user');
+      history = firstUserIdx >= 0 ? history.slice(firstUserIdx) : [];
     }
 
     const chat = model.startChat({ history });
