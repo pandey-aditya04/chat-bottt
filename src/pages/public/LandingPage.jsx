@@ -10,7 +10,14 @@ import { pricingPlans } from '../../data/pricingPlans';
 import { mockBots } from '../../data/mockBots';
 import ChatWidget from '../../components/chatbot/ChatWidget';
 import FadeIn from '../../components/ui/FadeIn';
-import RobotScene from '../../components/3d/RobotScene';
+import { InteractiveRobotSpline } from '../../components/ui/interactive-3d-robot';
+import { LiquidButton } from '../../components/ui/liquid-glass-button';
+import { SpotlightHover } from '../../components/ui/spotlight-hover';
+import { Boxes } from '../../components/ui/background-boxes';
+import { FeaturesSection } from '../../components/ui/features-5';
+import { WavePath } from '../../components/ui/wave-path';
+import HeroFuturistic from '../../components/ui/hero-futuristic';
+import StickyFooter from '../../components/ui/footer';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Helmet } from 'react-helmet-async';
 import { useTheme } from '../../context/ThemeContext';
@@ -135,70 +142,7 @@ const LandingPage = () => {
       </nav>
 
       {/* Hero Section */}
-      <section className="relative pt-44 pb-28 lg:pt-56 lg:pb-40 overflow-hidden">
-        <div className="absolute inset-0 pointer-events-none">
-          <div className="absolute top-0 left-1/4 w-[500px] h-[500px] bg-brand/10 rounded-full blur-[120px]" />
-          <div className="absolute bottom-0 right-1/4 w-[500px] h-[500px] bg-accent/10 rounded-full blur-[120px]" />
-        </div>
-        
-        <div className="relative max-w-7xl mx-auto px-6 md:px-12">
-          <div className="grid md:grid-cols-2 gap-12 lg:gap-20 items-center">
-            <div className="text-left">
-              <FadeIn delay={0.1}>
-                <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-brand/10 border border-brand/20 text-brand text-xs font-bold uppercase tracking-widest mb-8">
-                  <Zap className="w-3.5 h-3.5" /> No-code AI platform
-                </div>
-              </FadeIn>
-              
-              <FadeIn delay={0.2} className="relative z-10 py-2">
-                <h1 className="mb-8 leading-[1.1] pb-2">
-                  <span className="gradient-text">Build AI Chatbots</span> your visitors actually talk to.
-                </h1>
-              </FadeIn>
-
-              <FadeIn delay={0.3}>
-                <p className="text-lg text-text-secondary mb-10 max-w-xl leading-relaxed">
-                  Transform your static FAQ into an intelligent, interactive assistant in minutes. Embed it on any site with a single line of code.
-                </p>
-              </FadeIn>
-
-              <FadeIn delay={0.4} className="flex flex-col sm:flex-row gap-5">
-                <button 
-                  onClick={() => navigate('/signup')} 
-                  className="px-10 py-4.5 bg-brand hover:bg-brand-hover text-white font-bold rounded-xl transition-all shadow-xl shadow-brand/20 hover:shadow-brand/40 hover:-translate-y-1 flex items-center justify-center gap-3"
-                >
-                  Start Building Free <ArrowRight className="w-5 h-5" />
-                </button>
-                <button 
-                  onClick={() => document.getElementById('demo')?.scrollIntoView({ behavior: 'smooth' })} 
-                  className="px-10 py-4.5 bg-surface-raised border border-border hover:border-brand/50 text-text-primary font-bold rounded-xl transition-all flex items-center justify-center gap-3 shadow-sm"
-                >
-                  <Play className="w-5 h-5 fill-current" /> Watch Demo
-                </button>
-              </FadeIn>
-
-              <FadeIn delay={0.5} className="mt-12 flex items-center gap-6">
-                <div className="flex -space-x-3">
-                  {[1,2,3,4].map((i) => (
-                    <div key={i} className="w-10 h-10 rounded-full border-2 border-surface bg-surface-raised flex items-center justify-center text-[10px] font-bold">U{i}</div>
-                  ))}
-                </div>
-                <div>
-                  <div className="flex gap-0.5">
-                    {[...Array(5)].map((_, i) => <Star key={i} className="w-4 h-4 fill-warning text-warning" />)}
-                  </div>
-                  <p className="text-xs text-text-secondary mt-1">Trusted by <span className="text-text-primary font-bold">10k+</span> creators</p>
-                </div>
-              </FadeIn>
-            </div>
-
-            <div className="hidden md:block relative">
-              <div className="absolute inset-0 bg-brand/10 rounded-full blur-[120px] animate-pulse" />
-              <RobotScene />
-            </div>
-          </div>
-        </div>
-      </section>
+      <HeroFuturistic onExplore={() => navigate('/signup')} />
 
       {/* How It Works */}
       <section id="how-it-works" className="py-24 lg:py-32 bg-surface-raised/30">
@@ -248,9 +192,29 @@ const LandingPage = () => {
         </div>
       </section>
 
+      {/* Detailed Scaling Features */}
+      <FeaturesSection />
+
+      {/* Interactive Separator */}
+      <section className="w-full flex flex-col items-center justify-center py-16 overflow-hidden relative">
+        <div className="absolute inset-0 bg-gradient-to-b from-transparent via-brand/5 to-transparent pointer-events-none" />
+        <div className="flex w-[80vw] md:w-[70vw] flex-col items-center relative z-10">
+          <WavePath className="mb-12" />
+          <div className="flex w-full flex-col items-center text-center max-w-2xl">
+            <p className="text-brand font-black uppercase tracking-widest text-xs mb-4">Fluid Interaction</p>
+            <p className="text-text-secondary text-xl md:text-2xl leading-relaxed">
+              Experience natural, flowing dialogue powered by advanced AI. Hover the line above to feel the responsiveness.
+            </p>
+          </div>
+        </div>
+      </section>
+
       {/* Demo Section */}
-      <section id="demo" className="py-24 lg:py-32 bg-surface-raised/50">
-        <div className="max-w-6xl mx-auto px-6 md:px-12">
+      <section id="demo" className="py-24 lg:py-32 bg-surface-raised/50 overflow-hidden relative">
+        {/* Ambient background glow for the bot */}
+        <div className="absolute top-1/2 left-1/4 w-[600px] h-[600px] -translate-y-1/2 bg-brand/5 rounded-full blur-[120px] pointer-events-none" />
+        
+        <div className="max-w-7xl mx-auto px-6 md:px-12 relative z-10">
           <div className="text-center mb-16">
             <FadeIn>
               <h2 className="mb-4">Try It <span className="gradient-text">Live</span></h2>
@@ -258,18 +222,37 @@ const LandingPage = () => {
             </FadeIn>
           </div>
           
-          <FadeIn delay={0.2} className="flex justify-center">
-            <div className="w-full max-w-lg shadow-2xl rounded-3xl overflow-hidden border border-border">
-              <ChatWidget 
-                faqs={demoBot.faqs} 
-                primaryColor="#6366f1" 
-                welcomeMessage="Hi! 👋 I'm a demo bot. Ask me anything about ChatBot Builder!" 
-                chatWindowTitle="Live Demo" 
-                isDemo={true}
-                inline 
+          <div className="grid md:grid-cols-2 gap-12 lg:gap-20 items-center">
+            {/* Interactive Bot Side */}
+            <FadeIn delay={0.2} className="hidden md:block relative h-[500px] w-full">
+              <div className="absolute inset-0 pointer-events-none flex flex-col items-center justify-end pb-8">
+                <div className="bg-surface/50 backdrop-blur-md border border-white/10 px-6 py-3 rounded-2xl text-sm font-medium shadow-xl">
+                  👋 Hover over me! I'm watching your cursor.
+                </div>
+              </div>
+              <InteractiveRobotSpline 
+                scene="https://prod.spline.design/PyzDhpQ9E5f1E3MT/scene.splinecode"
+                className="w-full h-full"
               />
-            </div>
-          </FadeIn>
+            </FadeIn>
+
+            {/* Chat Widget Side */}
+            <FadeIn delay={0.3} className="flex justify-center md:justify-start">
+              <div className="w-full max-w-lg shadow-2xl rounded-3xl overflow-hidden border border-border bg-surface relative group">
+                <div className="absolute -inset-1 bg-gradient-to-r from-brand to-accent rounded-[26px] blur opacity-20 group-hover:opacity-40 transition duration-1000"></div>
+                <div className="relative">
+                  <ChatWidget 
+                    faqs={demoBot.faqs} 
+                    primaryColor="#6366f1" 
+                    welcomeMessage="Hi! 👋 I'm your interactive demo bot. Ask me anything about ChatBot Builder!" 
+                    chatWindowTitle="Live Demo" 
+                    isDemo={true}
+                    inline 
+                  />
+                </div>
+              </div>
+            </FadeIn>
+          </div>
         </div>
       </section>
 
@@ -310,12 +293,13 @@ const LandingPage = () => {
                   ))}
                 </ul>
 
-                <button 
+                <LiquidButton 
                   onClick={() => navigate('/signup')} 
-                  className={`w-full py-4 rounded-xl font-bold text-sm transition-all ${plan.highlight ? 'bg-brand text-white shadow-lg shadow-brand/20 hover:bg-brand-hover' : 'bg-surface-overlay text-text-primary hover:bg-border'}`}
+                  variant={plan.highlight ? 'default' : 'secondary'}
+                  className="w-full py-6"
                 >
                   {plan.cta}
-                </button>
+                </LiquidButton>
               </FadeIn>
             ))}
           </div>
@@ -323,50 +307,7 @@ const LandingPage = () => {
       </section>
 
       {/* Footer */}
-      <footer className="py-20 border-t border-border bg-surface">
-        <div className="max-w-6xl mx-auto px-6 md:px-12">
-          <div className="grid md:grid-cols-[1.5fr,1fr,1fr,1fr] gap-12">
-            <div>
-              <div className="flex items-center gap-2.5 mb-6">
-                <div className="w-8 h-8 rounded-lg bg-brand flex items-center justify-center">
-                  <Bot className="w-5 h-5 text-white" />
-                </div>
-                <span className="font-bold text-lg">ChatBot<span className="gradient-text">Builder</span></span>
-              </div>
-              <p className="text-sm text-text-secondary mb-8 leading-relaxed">
-                Empowering businesses with intelligent, no-code AI assistants since 2024.
-              </p>
-              <div className="flex gap-4">
-                {[Share2, LinkIcon, Globe].map((Icon, i) => (
-                  <button key={i} className="w-10 h-10 rounded-xl bg-surface-raised border border-border flex items-center justify-center text-text-secondary hover:text-brand hover:border-brand transition-all">
-                    <Icon className="w-4 h-4" />
-                  </button>
-                ))}
-              </div>
-            </div>
-            
-            {[{title:'Product',links:['Features','Pricing','Integrations']},{title:'Company',links:['About','Blog','Careers']},{title:'Legal',links:['Privacy','Terms','Security']}].map((col, i) => (
-              <div key={i}>
-                <h4 className="text-sm font-black uppercase tracking-widest text-text-primary mb-6">{col.title}</h4>
-                <ul className="space-y-4">
-                  {col.links.map((link) => (
-                    <li key={link}>
-                      <a href="#" className="text-sm text-text-secondary hover:text-brand transition-colors">{link}</a>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            ))}
-          </div>
-          <div className="mt-20 pt-8 border-t border-border flex flex-col md:flex-row justify-between items-center gap-6">
-            <p className="text-xs text-text-muted">© {new Date().getFullYear()} ChatBot Builder. All rights reserved.</p>
-            <div className="flex gap-8 text-xs text-text-muted">
-              <a href="#" className="hover:text-text-secondary transition-colors">Privacy Policy</a>
-              <a href="#" className="hover:text-text-secondary transition-colors">Terms of Service</a>
-            </div>
-          </div>
-        </div>
-      </footer>
+      <StickyFooter />
     </div>
   );
 };

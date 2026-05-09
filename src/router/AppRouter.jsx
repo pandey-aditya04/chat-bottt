@@ -10,6 +10,7 @@ const SignupPage = lazy(() => import('../pages/public/SignupPage'));
 const PricingPage = lazy(() => import('../pages/public/PricingPage'));
 const BotEmbedView = lazy(() => import('../pages/public/BotEmbedView'));
 const AuthCallback = lazy(() => import('../pages/AuthCallback'));
+const DemoPage = lazy(() => import('../pages/DemoPage'));
 
 // Dashboard Pages
 const DashboardLayout = lazy(() => import('../components/layout/DashboardLayout'));
@@ -61,6 +62,7 @@ const AnimatedRoutes = () => {
           <Route path="/pricing" element={<PageWrapper><PricingPage /></PageWrapper>} />
           <Route path="/embed/:botId" element={<BotEmbedView />} />
           <Route path="/auth/callback" element={<AuthCallback />} />
+          <Route path="/demo" element={<PageWrapper><DemoPage /></PageWrapper>} />
 
           {/* Dashboard Routes */}
           <Route
