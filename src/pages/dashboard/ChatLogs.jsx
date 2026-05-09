@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Search, Download, Bot, User, MessageSquare } from 'lucide-react';
-import Card from '../../components/ui/Card';
+import { Card } from '../../components/ui/card';
 import Badge from '../../components/ui/Badge';
 import Button from '../../components/ui/Button';
 import Skeleton from '../../components/ui/Skeleton';

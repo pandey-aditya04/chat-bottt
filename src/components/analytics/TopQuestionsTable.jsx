@@ -1,6 +1,6 @@
 import { TrendingUp, TrendingDown, Minus } from 'lucide-react';
 import { useTheme } from '../../context/ThemeContext';
-import Card from '../ui/Card';
+import { Card } from '../ui/card';
 
 const TopQuestionsTable = ({ questions = [] }) => {
   const { isDark } = useTheme();

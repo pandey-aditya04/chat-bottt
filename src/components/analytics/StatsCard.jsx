@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useTheme } from '../../context/ThemeContext';
-import Card from '../ui/Card';
+import { Card } from '../ui/card';
 import { motion, useSpring, useTransform } from 'framer-motion';
 
 const StatsCard = ({ title, value, icon: Icon, trend, trendValue, color = 'primary' }) => {

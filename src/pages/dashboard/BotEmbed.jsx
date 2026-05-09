@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Copy, Check, ChevronDown, ChevronUp, Code2, ExternalLink, Globe, Layout, Smartphone } from 'lucide-react';
-import Card from '../../components/ui/Card';
+import { Card } from '../../components/ui/card';
 import Button from '../../components/ui/Button';
 import ChatWidget from '../../components/chatbot/ChatWidget';
 import FadeIn from '../../components/ui/FadeIn';

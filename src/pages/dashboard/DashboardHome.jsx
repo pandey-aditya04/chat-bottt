@@ -1,7 +1,7 @@
 import { useNavigate } from 'react-router-dom';
 import { Bot, MessageSquare, Activity, Zap, Plus, ArrowRight, Sparkles, Check } from 'lucide-react';
 import StatsCard from '../../components/analytics/StatsCard';
-import Card from '../../components/ui/Card';
+import { Card } from '../../components/ui/card';
 import Badge from '../../components/ui/Badge';
 import Button from '../../components/ui/Button';
 import FadeIn from '../../components/ui/FadeIn';

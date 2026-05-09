@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { ArrowLeft, ArrowRight, Plus, X, Check, Bot, Upload, Save } from 'lucide-react';
 import Button from '../../components/ui/Button';
 import Input from '../../components/ui/Input';
-import Card from '../../components/ui/Card';
+import { Card } from '../../components/ui/card';
 import ChatWidget from '../../components/chatbot/ChatWidget';
 import FadeIn from '../../components/ui/FadeIn';
 import { useBots } from '../../context/BotContext';

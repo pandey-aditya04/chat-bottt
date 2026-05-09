@@ -3,7 +3,7 @@ import { BarChart2, MessageSquare, Users, Calendar, TrendingUp } from 'lucide-re
 import { LineChart, Line, BarChart, Bar, PieChart, Pie, Cell, XAxis, YAxis, CartesianGrid, Tooltip as RTooltip, ResponsiveContainer, Legend } from 'recharts';
 import StatsCard from '../../components/analytics/StatsCard';
 import TopQuestionsTable from '../../components/analytics/TopQuestionsTable';
-import Card from '../../components/ui/Card';
+import { Card } from '../../components/ui/card';
 import Skeleton from '../../components/ui/Skeleton';
 import { messagesPerDay, conversationsPerBot, questionMatchData, topQuestions, analyticsStats } from '../../data/mockAnalytics';
 import { useBots } from '../../context/BotContext';
