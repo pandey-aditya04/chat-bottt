@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import {
   Bot, Zap, Palette, BarChart2, Layers, Settings2,
@@ -47,6 +47,11 @@ const LandingPage = () => {
   const { isAuthenticated } = useAuth();
   const [mobileMenu, setMobileMenu] = useState(false);
   const demoBot = mockBots[0];
+
+  useEffect(() => {
+    // Ensure page starts at the top on mount/refresh
+    window.scrollTo(0, 0);
+  }, []);
 
   return (
     <div className={`min-h-screen ${isDark ? 'bg-surface text-text-primary' : 'light bg-surface text-text-primary'}`}>

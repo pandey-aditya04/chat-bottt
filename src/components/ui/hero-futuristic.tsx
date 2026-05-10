@@ -18,9 +18,12 @@ import {
   vec3,
   pass,
   mix,
-  add
+  add,
+  positionLocal,
+  normalLocal
 } from 'three/tsl';
 import { TextScramble } from './text-scramble';
+import { BoxesCore } from './background-boxes';
 
 extend(THREE as any);
 
@@ -87,7 +90,37 @@ const PostProcessing = ({
   return null;
 };
 
-// Scene component removed per user request
+const Scene = () => {
+  const meshRef = useRef<THREE.Mesh>(null);
+  
+  const material = useMemo(() => {
+    const time = uniform(0);
+    const displacement = mx_cell_noise_float(uv().mul(5).add(time.mul(0.2))).mul(0.5);
+    
+    const mat = new THREE.MeshStandardNodeMaterial();
+    mat.colorNode = vec3(0.9, 0.9, 1.0);
+    mat.roughness = 0.2;
+    mat.metalness = 0.1;
+    mat.positionNode = positionLocal.add(normalLocal.mul(displacement));
+    
+    return { mat, time };
+  }, []);
+
+  useFrame((state) => {
+    if (meshRef.current) {
+      meshRef.current.rotation.y = state.clock.getElapsedTime() * 0.15;
+      meshRef.current.rotation.z = state.clock.getElapsedTime() * 0.1;
+      material.time.value = state.clock.getElapsedTime();
+    }
+  });
+
+  return (
+    <mesh ref={meshRef} position={[0, 0, -2]}>
+      <icosahedronGeometry args={[2.5, 128]} />
+      <primitive object={material.mat} attach="material" />
+    </mesh>
+  );
+};
 
 export const HeroFuturistic = ({ onExplore }: { onExplore?: () => void }) => {
   const titleWords = 'Build AI Chatbots'.split(' ');
@@ -113,7 +146,10 @@ export const HeroFuturistic = ({ onExplore }: { onExplore?: () => void }) => {
   }, [visibleWords, titleWords.length]);
 
   return (
-    <div className="relative h-svh w-full overflow-hidden bg-black">
+    <div className="relative h-svh w-full overflow-hidden bg-slate-900">
+      <div className="absolute inset-0 z-0 pointer-events-none opacity-40">
+        <BoxesCore />
+      </div>
       {/* Subtle dark gradient overlay to ensure text contrast against the bright 3D model */}
       <div className="absolute inset-0 z-10 flex flex-col items-center justify-center pointer-events-none px-6 md:px-12 bg-[radial-gradient(ellipse_at_center,rgba(0,0,0,0.65)_0%,transparent_70%)]">
         <div className="text-4xl md:text-6xl xl:text-7xl 2xl:text-8xl font-black text-center max-w-5xl tracking-tighter drop-shadow-[0_4px_8px_rgba(0,0,0,0.8)]">
@@ -179,8 +215,8 @@ export const HeroFuturistic = ({ onExplore }: { onExplore?: () => void }) => {
           }}
         >
           <Suspense fallback={null}>
-            <PostProcessing fullScreenEffect={true} />
-            {/* Image scene removed per user request */}
+            <PostProcessing fullScreenEffect={true} strength={0.4} threshold={0.8} />
+            <Scene />
           </Suspense>
         </Canvas>
       </ErrorBoundary>
