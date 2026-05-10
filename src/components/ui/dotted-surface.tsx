@@ -38,13 +38,22 @@ export function DottedSurface({ className, ...props }: DottedSurfaceProps) {
 		);
 		camera.position.set(0, 355, 1220);
 
+		// Create material
+		const material = new THREE.PointsMaterial({
+			size: 10,
+			vertexColors: true,
+			transparent: true,
+			opacity: 0.8,
+			sizeAttenuation: true,
+		});
+
 		const renderer = new THREE.WebGLRenderer({
-			alpha: true,
+			alpha: false, // Changed to false to allow clearColor to show
 			antialias: true,
 		});
 		renderer.setPixelRatio(window.devicePixelRatio);
 		renderer.setSize(window.innerWidth, window.innerHeight);
-		renderer.setClearColor(scene.fog.color, 0);
+		renderer.setClearColor(isDark ? 0x0a0a16 : 0xf8fafc, 1); // Use surface colors
 
 		containerRef.current.appendChild(renderer.domElement);
 
@@ -76,15 +85,6 @@ export function DottedSurface({ className, ...props }: DottedSurfaceProps) {
 			new THREE.Float32BufferAttribute(positions, 3),
 		);
 		geometry.setAttribute('color', new THREE.Float32BufferAttribute(colors, 3));
-
-		// Create material
-		const material = new THREE.PointsMaterial({
-			size: 8,
-			vertexColors: true,
-			transparent: true,
-			opacity: 0.3,
-			sizeAttenuation: true,
-		});
 
 		// Create points object
 		const points = new THREE.Points(geometry, material);

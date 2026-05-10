@@ -18,6 +18,7 @@ import { FeaturesSection } from '../../components/ui/features-5';
 import { WavePath } from '../../components/ui/wave-path';
 import { ContainerScroll } from '../../components/ui/container-scroll-animation';
 import { PricingCard } from '../../components/ui/animated-glassy-pricing';
+import { DottedSurface } from '../../components/ui/dotted-surface';
 import HeroFuturistic from '../../components/ui/hero-futuristic';
 import StickyFooter from '../../components/ui/footer';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -53,7 +54,7 @@ const LandingPage = () => {
   }, []);
 
   return (
-    <div className={`min-h-screen ${isDark ? 'bg-surface text-text-primary' : 'light bg-surface text-text-primary'}`}>
+    <div className={`min-h-screen ${isDark ? 'bg-transparent text-text-primary' : 'light bg-transparent text-text-primary'}`}>
       <Helmet>
         <title>ChatBot Builder | Build AI Chatbots for Your Website</title>
         <meta name="description" content="Transform your static FAQ into an intelligent, interactive assistant in minutes. No-code AI platform for building custom chatbots." />
@@ -61,6 +62,8 @@ const LandingPage = () => {
         <meta property="og:description" content="Build AI Chatbots your visitors actually talk to. Transform your static FAQ into an interactive assistant." />
       </Helmet>
       
+      <DottedSurface />
+
       {/* Navigation */}
       <nav className={`fixed top-0 w-full z-50 ${isDark ? 'bg-surface/80' : 'bg-surface/80'} backdrop-blur-xl border-b border-border`}>
         <div className="max-w-6xl mx-auto px-6 md:px-12">
@@ -177,7 +180,7 @@ const LandingPage = () => {
       </section>
 
       {/* Dashboard Preview with Scroll Animation */}
-      <section className="bg-surface overflow-hidden">
+      <section className="bg-transparent overflow-hidden">
         <ContainerScroll
           titleComponent={
             <div className="mb-10">

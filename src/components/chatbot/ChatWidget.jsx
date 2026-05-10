@@ -102,7 +102,8 @@ const ChatWidget = ({
 
   // Scroll to bottom
   useEffect(() => {
-    if (messages.length > 0 || isTyping) {
+    // Only scroll if there's more than just the welcome message, or if typing
+    if (messages.length > 1 || isTyping) {
       messagesEndRef.current?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
     }
   }, [messages, isTyping]);
