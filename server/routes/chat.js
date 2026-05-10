@@ -11,27 +11,36 @@ router.post('/', async (req, res) => {
 
     const { data: bot, error: botError } = await supabase
       .from('bots')
-      .select('*, faqs(*)')
+      .select('*, faqs(*), training_sources(*)')
       .eq('id', botId)
       .single();
 
     if (botError || !bot) return res.status(404).json({ error: 'Bot not found' });
 
     const faqContext = bot.faqs?.map(f => `Q: ${f.question}\nA: ${f.answer}`).join('\n\n') || '';
+    
+    // Get all ready training sources
+    const readySources = bot.training_sources?.filter(s => s.status === 'ready') || [];
+    const sourceContext = readySources.map(s => `SOURCE: ${s.name}\n${s.content}`).join('\n\n---\n\n');
+    
+    const combinedKnowledge = `
+    ${faqContext ? `FAQ Knowledge:\n${faqContext}` : ''}
+    ${sourceContext ? `\n\nDocument/Website Knowledge:\n${sourceContext}` : ''}
+    `.trim();
 
-    const systemPrompt = `
+    const defaultSystemPrompt = `
       You are ${bot.name}, a helpful AI assistant.
       
       PERSONALITY:
       Tone: ${bot.tone || 'Friendly'}
       
       KNOWLEDGE BASE:
-      ${faqContext ? `
+      ${combinedKnowledge ? `
       You have access to a specific knowledge base provided below. 
       Answer the user's questions based on this information.
       
       INFORMATION:
-      ${faqContext}
+      ${combinedKnowledge}
       ` : 'Answer helpfully and professionally based on your general knowledge.'}
       
       GENERAL CONVERSATION:
@@ -46,6 +55,10 @@ router.post('/', async (req, res) => {
       - Stay in character as ${bot.name}.
       - Don't mention you are an AI model.
     `;
+    
+    const systemPrompt = bot.system_prompt 
+      ? `${bot.system_prompt}\n\nKNOWLEDGE BASE:\n${combinedKnowledge}` 
+      : defaultSystemPrompt;
 
     if (!process.env.GEMINI_API_KEY) {
       console.error('GEMINI_API_KEY is not set!');
@@ -54,7 +67,7 @@ router.post('/', async (req, res) => {
 
     const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
     const model = genAI.getGenerativeModel({ 
-      model: 'gemini-flash-latest',
+      model: bot.model || 'gemini-flash-latest',
       systemInstruction: systemPrompt
     });
 

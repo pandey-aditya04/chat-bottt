@@ -2,15 +2,21 @@ const express = require('express');
 const router = express.Router();
 const authenticate = require('../middleware/auth');
 const { supabase } = require('../config/supabase');
+const { checkBotLimit } = require('../middleware/planLimits');
 
 // Helper to map camelCase (frontend) to snake_case (DB)
 const mapToSnakeCase = (data) => ({
   name: data.name,
   website: data.website,
   primary_color: data.color || data.primaryColor || data.primary_color || '#6366f1',
+  background_color: data.backgroundColor || data.background_color || '#0d0d1a',
+  logo_url: data.logoUrl || data.logo_url,
   welcome_message: data.welcomeMessage || data.welcome_message,
   tone: data.tone || 'Friendly',
   fallback_message: data.fallbackMessage || data.fallback_message,
+  system_prompt: data.systemPrompt || data.system_prompt,
+  model: data.model || 'gemini-flash-latest',
+  quick_prompts: data.quickPrompts || data.quick_prompts || [],
   chat_position: data.chatPosition || data.chat_position || 'Right',
   launcher_icon: data.launcherIcon || data.launcher_icon || 'Chat Bubble',
   chat_window_title: data.chatWindowTitle || data.chat_window_title || data.name || 'Chat',
@@ -38,7 +44,7 @@ router.get('/', authenticate, async (req, res) => {
 });
 
 // POST /api/bots - Create bot
-router.post('/', authenticate, async (req, res) => {
+router.post('/', authenticate, checkBotLimit, async (req, res) => {
   try {
     const { name, faqs } = req.body;
     console.log('Creating bot for user:', req.userId, 'name:', name);

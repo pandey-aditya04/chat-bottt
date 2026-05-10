@@ -1,171 +1,235 @@
 import { useState, useEffect } from 'react';
-import { Search, Download, Bot, User, MessageSquare } from 'lucide-react';
+import { MessageSquare, Calendar, ChevronDown, Download, Filter, Search, Loader2 } from 'lucide-react';
 import { Card } from '../../components/ui/card';
 import Badge from '../../components/ui/Badge';
+import Input from '../../components/ui/Input';
 import Button from '../../components/ui/Button';
-import Skeleton from '../../components/ui/Skeleton';
-import { useTheme } from '../../context/ThemeContext';
-import { useToast } from '../../hooks/useToast';
-import { useAuth } from '../../context/AuthContext';
 import FadeIn from '../../components/ui/FadeIn';
-
-const API_URL = import.meta.env.VITE_API_URL || 'https://chat-bottt.onrender.com/api';
+import { useBots } from '../../context/BotContext';
+import { formatDate } from '../../utils/formatDate';
+import api from '../../lib/api';
 
 const ChatLogs = () => {
-  const { isDark } = useTheme();
-  const { token } = useAuth();
-  const toast = useToast();
-  const [loading, setLoading] = useState(true);
+  const { bots } = useBots();
   const [logs, setLogs] = useState([]);
-  const [selected, setSelected] = useState(null);
-  const [search, setSearch] = useState('');
-
-  useEffect(() => {
-    fetchLogs();
-  }, []);
+  const [loading, setLoading] = useState(true);
+  const [expandedLog, setExpandedLog] = useState(null);
+  
+  // Filters
+  const [selectedBot, setSelectedBot] = useState('all');
+  const [searchQuery, setSearchQuery] = useState('');
+  const [page, setPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
 
   const fetchLogs = async () => {
     setLoading(true);
     try {
-      const res = await fetch(`${API_URL}/logs`, {
-        headers: { 'Authorization': `Bearer ${token}` }
-      });
-      if (res.ok) {
-        const data = await res.json();
-        setLogs(data);
-        if (data.length > 0) setSelected(data[0]);
-      }
+      let url = `/logs?page=${page}&limit=20`;
+      if (selectedBot !== 'all') url += `&botId=${selectedBot}`;
+      if (searchQuery) url += `&search=${encodeURIComponent(searchQuery)}`;
+      
+      const { data } = await api.get(url);
+      setLogs(data.data || data); // handle both old array format and new paginated format
+      if (data.totalPages) setTotalPages(data.totalPages);
     } catch (err) {
-      console.error('Failed to fetch logs:', err);
-      toast.error('Failed to load chat logs');
+      console.error('Error fetching logs:', err);
     } finally {
       setLoading(false);
     }
   };
 
-  const filtered = logs.filter(log =>
-    (log.botName || '').toLowerCase().includes(search.toLowerCase()) ||
-    (log.sessionId || '').toLowerCase().includes(search.toLowerCase())
-  );
+  useEffect(() => {
+    fetchLogs();
+  }, [selectedBot, page]); // Only re-fetch on these changes, search is handled by button/enter
 
-  if (loading) {
-    return (
-      <div className="grid lg:grid-cols-3 gap-6 h-[calc(100vh-200px)]">
-        <div className="space-y-3"><Skeleton className="h-20" count={5} /></div>
-        <div className="lg:col-span-2"><Skeleton className="h-full" /></div>
-      </div>
-    );
-  }
+  const handleSearch = (e) => {
+    e.preventDefault();
+    setPage(1);
+    fetchLogs();
+  };
+
+  const exportCSV = () => {
+    const headers = ['Bot', 'Session ID', 'Date', 'User Query', 'Bot Response', 'Matched Knowledge Base'];
+    const rows = [];
+
+    logs.forEach(log => {
+      const msgs = log.messages || [];
+      for (let i = 0; i < msgs.length; i += 2) {
+        const userMsg = msgs[i]?.role === 'user' ? msgs[i].text : '';
+        const botMsg = msgs[i+1]?.role === 'bot' ? msgs[i+1].text : '';
+        const matched = msgs[i+1]?.matched ? 'Yes' : 'No';
+        
+        rows.push([
+          `"${log.bot_name}"`,
+          `"${log.session_id}"`,
+          `"${formatDate(log.created_at)}"`,
+          `"${userMsg.replace(/"/g, '""')}"`,
+          `"${botMsg.replace(/"/g, '""')}"`,
+          matched
+        ].join(','));
+      }
+    });
+
+    const csvContent = headers.join(',') + '\n' + rows.join('\n');
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement("a");
+    const url = URL.createObjectURL(blob);
+    link.setAttribute("href", url);
+    link.setAttribute("download", `chat_logs_${new Date().toISOString().split('T')[0]}.csv`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
 
   return (
-    <div className="grid lg:grid-cols-3 gap-6 animate-fade-in" style={{ height: 'calc(100vh - 160px)' }}>
-      {/* Left - Conversation List */}
-      <div className="flex flex-col h-full overflow-hidden">
-        <div className="flex items-center gap-2 mb-4">
-          <div className="flex-1 flex items-center gap-2 px-4 py-2.5 rounded-xl bg-surface-raised border border-border focus-within:border-brand/50 transition-all">
-            <Search className="w-4 h-4 text-text-muted" />
-            <input 
-              value={search} 
-              onChange={e => setSearch(e.target.value)} 
-              placeholder="Search by session or bot..." 
-              className="flex-1 bg-transparent text-sm outline-none placeholder:text-text-muted text-text-primary" 
-            />
+    <div className="space-y-8 animate-fade-in pb-20">
+      <FadeIn direction="none">
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
+          <div>
+            <h2 className="text-3xl font-black tracking-tight mb-2">Conversation Logs</h2>
+            <p className="text-text-secondary text-sm">Review past conversations to improve your bot's knowledge base.</p>
           </div>
-          <Button variant="outline" size="sm" icon={Download} onClick={() => toast.info('Export coming soon!')}>Export</Button>
+          <Button icon={Download} onClick={exportCSV} className="shadow-lg shadow-brand/20">
+            Export CSV
+          </Button>
         </div>
-        
-        <div className="flex-1 overflow-y-auto space-y-2 pr-1 custom-scrollbar">
-          {filtered.map(log => (
-            <div
-              key={log._id}
-              onClick={() => setSelected(log)}
-              className={`p-4 rounded-2xl cursor-pointer transition-all border ${
-                selected?._id === log._id
-                  ? 'bg-brand/10 border-brand shadow-glow-brand/20'
-                  : 'bg-surface-raised border-border hover:border-brand/30'
-              }`}
-            >
-              <div className="flex items-center justify-between mb-2">
-                <span className="text-xs font-black uppercase tracking-widest text-brand">{log.sessionId?.slice(0, 12)}...</span>
-                <Badge variant="default" size="sm" className="bg-surface-overlay border-border">{log.messageCount} msgs</Badge>
-              </div>
-              <h4 className="text-sm font-bold text-text-primary truncate">{log.botName}</h4>
-              <p className="text-[10px] mt-1 text-text-muted font-bold uppercase tracking-tighter">{new Date(log.createdAt).toLocaleString()}</p>
+      </FadeIn>
+
+      <FadeIn delay={0.1}>
+        <Card className="border-border/60">
+          <div className="flex flex-col md:flex-row gap-4 mb-6">
+            <div className="flex-1">
+              <form onSubmit={handleSearch}>
+                <Input 
+                  icon={Search} 
+                  placeholder="Search in messages..." 
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="w-full"
+                />
+              </form>
             </div>
-          ))}
-          {filtered.length === 0 && (
-            <div className="text-center py-12 bg-surface-raised/50 rounded-3xl border border-dashed border-border">
-              <MessageSquare className="w-8 h-8 text-text-muted mx-auto mb-3 opacity-20" />
-              <p className="text-sm text-text-muted">No conversations found</p>
+            <div className="flex gap-4">
+              <div className="relative min-w-[200px]">
+                <Filter className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-text-muted" />
+                <select 
+                  className="w-full pl-10 pr-4 py-3 rounded-xl bg-surface-overlay border border-border text-sm text-text-primary focus:outline-none focus:ring-2 focus:ring-brand/50 appearance-none transition-all"
+                  value={selectedBot}
+                  onChange={(e) => { setSelectedBot(e.target.value); setPage(1); }}
+                >
+                  <option value="all">All Chatbots</option>
+                  {bots.map(b => (
+                    <option key={b.id} value={b.id}>{b.name}</option>
+                  ))}
+                </select>
+                <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 w-4 h-4 text-text-muted pointer-events-none" />
+              </div>
+            </div>
+          </div>
+
+          <div className="overflow-x-auto">
+            {loading ? (
+              <div className="py-20 flex justify-center">
+                <Loader2 className="w-8 h-8 text-brand animate-spin" />
+              </div>
+            ) : logs.length === 0 ? (
+              <div className="text-center py-20 text-text-secondary">
+                <MessageSquare className="w-12 h-12 mx-auto mb-4 opacity-50" />
+                <p>No conversations found.</p>
+              </div>
+            ) : (
+              <table className="w-full">
+                <thead>
+                  <tr className="bg-surface-overlay/50">
+                    <th className="text-left text-[10px] font-black uppercase tracking-widest px-6 py-4 text-text-muted">Session Info</th>
+                    <th className="text-left text-[10px] font-black uppercase tracking-widest px-6 py-4 text-text-muted">Preview</th>
+                    <th className="text-left text-[10px] font-black uppercase tracking-widest px-6 py-4 text-text-muted">Messages</th>
+                    <th className="text-left text-[10px] font-black uppercase tracking-widest px-6 py-4 text-text-muted">Date</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-border/40">
+                  {logs.map((log) => (
+                    <React.Fragment key={log.id}>
+                      <tr 
+                        className="hover:bg-surface-overlay/30 transition-colors cursor-pointer group"
+                        onClick={() => setExpandedLog(expandedLog === log.id ? null : log.id)}
+                      >
+                        <td className="px-6 py-5">
+                          <div className="flex items-center gap-3">
+                            <div className="w-8 h-8 rounded-lg bg-brand/10 flex items-center justify-center shrink-0">
+                              <MessageSquare className="w-4 h-4 text-brand" />
+                            </div>
+                            <div>
+                              <p className="text-xs font-bold text-text-primary">{log.bot_name}</p>
+                              <p className="text-[10px] text-text-muted font-mono">{log.session_id?.substring(0,8)}...</p>
+                            </div>
+                          </div>
+                        </td>
+                        <td className="px-6 py-5">
+                          <p className="text-xs text-text-secondary line-clamp-1 max-w-xs">
+                            {log.messages?.[0]?.text || "No messages"}
+                          </p>
+                        </td>
+                        <td className="px-6 py-5">
+                          <Badge variant="outline" className="px-2 py-0.5 text-[10px]">
+                            {log.message_count} msgs
+                          </Badge>
+                        </td>
+                        <td className="px-6 py-5">
+                          <div className="flex items-center gap-2 text-xs text-text-secondary">
+                            <Calendar className="w-3.5 h-3.5" />
+                            {formatDate(log.created_at)}
+                          </div>
+                        </td>
+                      </tr>
+                      {expandedLog === log.id && (
+                        <tr>
+                          <td colSpan="4" className="bg-black/20 p-6 border-b border-border/40">
+                            <div className="max-w-3xl space-y-4">
+                              {log.messages?.map((msg, i) => (
+                                <div key={i} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
+                                  <div className={`max-w-[80%] rounded-2xl p-4 ${
+                                    msg.role === 'user' 
+                                      ? 'bg-brand text-white rounded-tr-sm' 
+                                      : 'bg-surface-overlay border border-border text-text-primary rounded-tl-sm'
+                                  }`}>
+                                    <p className="text-xs leading-relaxed">{msg.text}</p>
+                                    <div className="flex items-center gap-2 mt-2">
+                                      <span className={`text-[9px] font-mono opacity-70 ${msg.role === 'user' ? 'text-white/70' : 'text-text-muted'}`}>
+                                        {msg.time}
+                                      </span>
+                                      {msg.role === 'bot' && (
+                                        <Badge variant={msg.matched ? 'success' : 'warning'} className="text-[8px] px-1.5 py-0 border-none">
+                                          {msg.matched ? 'KB Match' : 'Fallback'}
+                                        </Badge>
+                                      )}
+                                    </div>
+                                  </div>
+                                </div>
+                              ))}
+                            </div>
+                          </td>
+                        </tr>
+                      )}
+                    </React.Fragment>
+                  ))}
+                </tbody>
+              </table>
+            )}
+          </div>
+          
+          {totalPages > 1 && (
+            <div className="flex justify-center mt-6 gap-2">
+              <Button variant="outline" size="sm" disabled={page === 1} onClick={() => setPage(p => p - 1)}>Previous</Button>
+              <span className="flex items-center px-4 text-xs text-text-muted">Page {page} of {totalPages}</span>
+              <Button variant="outline" size="sm" disabled={page === totalPages} onClick={() => setPage(p => p + 1)}>Next</Button>
             </div>
           )}
-        </div>
-      </div>
-
-      {/* Right - Chat View */}
-      <div className="lg:col-span-2 h-full overflow-hidden">
-        {selected ? (
-          <FadeIn direction="none" className="h-full">
-            <Card padding="none" className="h-full flex flex-col border-border overflow-hidden bg-surface-raised/30">
-              <div className="p-5 border-b border-border bg-surface-raised">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <h3 className="text-lg font-black tracking-tight text-text-primary">{selected.sessionId}</h3>
-                    <p className="text-xs text-text-muted font-bold uppercase tracking-widest mt-1">
-                      {selected.botName} · {new Date(selected.createdAt).toLocaleDateString()}
-                    </p>
-                  </div>
-                  <Badge variant="success" className="bg-success/10 text-success border-success/20">Active Session</Badge>
-                </div>
-              </div>
-              
-              <div className="flex-1 overflow-y-auto p-6 space-y-6 custom-scrollbar bg-[#0d0d1a]/50">
-                {selected.messages.map((msg, i) => (
-                  <div key={i} className={`flex gap-4 ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
-                    {msg.role === 'bot' && (
-                      <div className="w-9 h-9 rounded-xl bg-brand/10 border border-brand/20 flex items-center justify-center flex-shrink-0 mt-1 shadow-sm">
-                        <Bot className="w-5 h-5 text-brand" />
-                      </div>
-                    )}
-                    <div className="max-w-[80%]">
-                      <div className={`rounded-2xl px-5 py-3 text-sm leading-relaxed shadow-sm ${
-                        msg.role === 'user'
-                          ? 'bg-brand text-white rounded-tr-none'
-                          : 'bg-surface-overlay text-text-primary border border-border rounded-tl-none'
-                      }`}>
-                        {msg.text}
-                      </div>
-                      <div className={`flex items-center gap-3 mt-1.5 px-1 ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
-                        <span className="text-[10px] text-text-muted font-bold uppercase">{msg.time}</span>
-                        {msg.matched !== undefined && (
-                          <Badge variant={msg.matched ? 'success' : 'danger'} size="sm" className="text-[8px] h-4 py-0 font-black">
-                            {msg.matched ? 'MATCHED' : 'UNMATCHED'}
-                          </Badge>
-                        )}
-                      </div>
-                    </div>
-                    {msg.role === 'user' && (
-                      <div className="w-9 h-9 rounded-xl bg-surface-overlay border border-border flex items-center justify-center flex-shrink-0 mt-1 shadow-sm">
-                        <User className="w-5 h-5 text-text-secondary" />
-                      </div>
-                    )}
-                  </div>
-                ))}
-              </div>
-            </Card>
-          </FadeIn>
-        ) : (
-          <div className="h-full flex flex-col items-center justify-center bg-surface-raised/20 rounded-3xl border border-dashed border-border p-12">
-            <div className="w-16 h-16 rounded-3xl bg-brand/5 flex items-center justify-center mb-6">
-              <MessageSquare className="w-8 h-8 text-brand/30" />
-            </div>
-            <h3 className="text-lg font-black text-text-primary mb-2">No Conversation Selected</h3>
-            <p className="text-sm text-text-muted max-w-xs text-center leading-relaxed">Select a session from the list on the left to review the conversation history.</p>
-          </div>
-        )}
-      </div>
+        </Card>
+      </FadeIn>
     </div>
   );
 };
 
+import React from 'react'; // ensure React is imported for React.Fragment
 export default ChatLogs;

@@ -14,7 +14,14 @@ console.log('GEMINI:', !!process.env.GEMINI_API_KEY);
 console.log('JWT:', !!process.env.JWT_SECRET);
 
 // Middleware
-app.use(helmet());
+app.use(helmet({
+  contentSecurityPolicy: false, // We'll manage CORS and basic security mostly via other means for the API
+  hsts: {
+    maxAge: 31536000,
+    includeSubDomains: true,
+    preload: true
+  }
+}));
 app.use(morgan('dev'));
 
 // CORS configuration
@@ -58,8 +65,10 @@ app.use('/api/bots/:botId/public', cors({ origin: '*' }));
 // Routes
 app.use('/api/auth', require('./routes/auth'));
 app.use('/api/bots', require('./routes/bot'));
+app.use('/api/bots', require('./routes/training')); // Added training routes
 app.use('/api/chat', require('./routes/chat'));
 app.use('/api/logs', require('./routes/log'));
+app.use('/api/billing', require('./routes/billing')); // Billing webhooks & routes
 
 // ─── PUBLIC: Get bot config (for embed widget) ─────────────────
 app.get('/api/bots/:botId/public', async (req, res) => {

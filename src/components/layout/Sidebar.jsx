@@ -1,8 +1,8 @@
 import { useState } from 'react';
-import { NavLink, useNavigate } from 'react-router-dom';
+import { NavLink, useNavigate, useParams, useLocation } from 'react-router-dom';
 import {
   LayoutDashboard, Bot, BarChart2, MessageSquare, Code2,
-  Settings, ChevronLeft, ChevronRight, LogOut, Sparkles, X
+  Settings, ChevronLeft, ChevronRight, LogOut, Sparkles, X, Database, TerminalSquare
 } from 'lucide-react';
 import { useTheme } from '../../context/ThemeContext';
 import { useAuth } from '../../context/AuthContext';
@@ -20,6 +20,8 @@ const Sidebar = ({ isOpen, onClose }) => {
   const { isDark } = useTheme();
   const { user, logout } = useAuth();
   const navigate = useNavigate();
+  const { botId } = useParams();
+  const location = useLocation();
 
   const handleLogout = () => {
     logout();
@@ -86,6 +88,37 @@ const Sidebar = ({ isOpen, onClose }) => {
               {!collapsed && <span className="text-sm font-medium">{item.label}</span>}
             </NavLink>
           ))}
+
+          {/* Dynamic Bot Links if we are inside a bot's subpage */}
+          {botId && (
+            <div className="pt-4 mt-4 border-t border-border">
+              <p className={`px-4 text-[10px] font-black uppercase tracking-widest text-text-muted mb-2 ${collapsed ? 'hidden' : 'block'}`}>
+                Active Bot
+              </p>
+              <NavLink
+                to={`/dashboard/bots/${botId}/embed`}
+                className={({ isActive }) => `
+                  flex items-center gap-3 px-4 py-3 rounded-xl transition-all font-bold text-sm group
+                  ${isActive ? 'bg-brand/10 text-brand' : 'text-text-secondary hover:bg-surface-raised hover:text-text-primary'}
+                `}
+                title={collapsed ? "Deploy/Embed" : ""}
+              >
+                <TerminalSquare className={`w-5 h-5 shrink-0 ${location.pathname.includes('/embed') ? 'text-brand' : 'text-text-muted group-hover:text-text-primary'}`} />
+                {!collapsed && <span>Deploy & Embed</span>}
+              </NavLink>
+              <NavLink
+                to={`/dashboard/bots/${botId}/train`}
+                className={({ isActive }) => `
+                  flex items-center gap-3 px-4 py-3 rounded-xl transition-all font-bold text-sm group mt-1
+                  ${isActive ? 'bg-brand/10 text-brand' : 'text-text-secondary hover:bg-surface-raised hover:text-text-primary'}
+                `}
+                title={collapsed ? "Knowledge Base" : ""}
+              >
+                <Database className={`w-5 h-5 shrink-0 ${location.pathname.includes('/train') ? 'text-brand' : 'text-text-muted group-hover:text-text-primary'}`} />
+                {!collapsed && <span>Knowledge Base</span>}
+              </NavLink>
+            </div>
+          )}
         </nav>
 
         {/* Upgrade Card */}

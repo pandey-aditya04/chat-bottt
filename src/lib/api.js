@@ -61,4 +61,19 @@ export const chatAPI = {
     api.post(`/chat`, { botId, query, sessionId }),
 };
 
+export const trainingAPI = {
+  getSources: (botId) => api.get(`/bots/${botId}/sources`),
+  deleteSource: (botId, sourceId) => api.delete(`/bots/${botId}/sources/${sourceId}`),
+  trainWithText: (botId, name, text) => api.post(`/bots/${botId}/train/text`, { name, text }),
+  trainWithUrl: (botId, url) => api.post(`/bots/${botId}/train/url`, { url }),
+  trainWithFile: (botId, file) => {
+    const formData = new FormData();
+    formData.append('file', file);
+    return api.post(`/bots/${botId}/train/file`, formData, {
+      headers: { 'Content-Type': 'multipart/form-data' }
+    });
+  },
+  retrain: (botId) => api.post(`/bots/${botId}/retrain`),
+};
+
 export default api;

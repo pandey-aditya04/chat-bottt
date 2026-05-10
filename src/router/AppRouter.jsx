@@ -9,6 +9,7 @@ const LoginPage = lazy(() => import('../pages/public/LoginPage'));
 const SignupPage = lazy(() => import('../pages/public/SignupPage'));
 const PricingPage = lazy(() => import('../pages/public/PricingPage'));
 const BotEmbedView = lazy(() => import('../pages/public/BotEmbedView'));
+const BotPublicView = lazy(() => import('../pages/public/BotPublicView'));
 const AuthCallback = lazy(() => import('../pages/AuthCallback'));
 const DemoPage = lazy(() => import('../pages/DemoPage'));
 
@@ -18,6 +19,7 @@ const DashboardHome = lazy(() => import('../pages/dashboard/DashboardHome'));
 const BotList = lazy(() => import('../pages/dashboard/BotList'));
 const CreateBot = lazy(() => import('../pages/dashboard/CreateBot'));
 const BotEmbed = lazy(() => import('../pages/dashboard/BotEmbed'));
+const TrainBot = lazy(() => import('../pages/dashboard/TrainBot'));
 const Analytics = lazy(() => import('../pages/dashboard/Analytics'));
 const ChatLogs = lazy(() => import('../pages/dashboard/ChatLogs'));
 const Settings = lazy(() => import('../pages/dashboard/Settings'));
@@ -61,6 +63,7 @@ const AnimatedRoutes = () => {
           <Route path="/signup" element={<PageWrapper><SignupPage /></PageWrapper>} />
           <Route path="/pricing" element={<PageWrapper><PricingPage /></PageWrapper>} />
           <Route path="/embed/:botId" element={<BotEmbedView />} />
+          <Route path="/bot/:botId" element={<BotPublicView />} />
           <Route path="/auth/callback" element={<AuthCallback />} />
           <Route path="/demo" element={<PageWrapper><DemoPage /></PageWrapper>} />
 
@@ -77,6 +80,7 @@ const AnimatedRoutes = () => {
             <Route path="bots" element={<BotList />} />
             <Route path="bots/new" element={<CreateBot />} />
             <Route path="bots/:botId/embed" element={<BotEmbed />} />
+            <Route path="bots/:botId/train" element={<TrainBot />} />
             <Route path="analytics" element={<Analytics />} />
             <Route path="logs" element={<ChatLogs />} />
             <Route path="settings" element={<Settings />} />

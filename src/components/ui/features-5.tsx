@@ -34,9 +34,8 @@ export function FeaturesSection() {
                     </div>
                     <div className="border-border/50 relative rounded-3xl border p-3 lg:col-span-3 bg-surface-raised/50 backdrop-blur-sm">
                         <div className="aspect-76/59 relative rounded-2xl overflow-hidden shadow-2xl">
-                            {/* Dashboard Preview Image */}
                             <img 
-                                src="https://images.unsplash.com/photo-1551288049-bbda646267aa?auto=format&fit=crop&q=80&w=2000" 
+                                src="/chatbot_analytics_dashboard.png" 
                                 className="w-full h-full object-cover" 
                                 alt="AI Chatbot Dashboard Analytics" 
                             />

@@ -11,6 +11,7 @@ const ChatWidget = ({
   botId,
   faqs: initialFaqs = [],
   primaryColor: initialColor = '#6366f1',
+  backgroundColor: initialBgColor = '#0d0d1a',
   position: initialPosition = 'Right',
   welcomeMessage: initialWelcome = 'Hi! How can I help you today?',
   chatWindowTitle: initialTitle = 'Support Chat',
@@ -26,6 +27,7 @@ const ChatWidget = ({
   const [config, setConfig] = useState({
     faqs: initialFaqs,
     primaryColor: initialColor,
+    backgroundColor: initialBgColor,
     position: initialPosition,
     welcomeMessage: initialWelcome,
     chatWindowTitle: initialTitle,
@@ -54,6 +56,7 @@ const ChatWidget = ({
             setConfig({
               faqs: data.faqs || [],
               primaryColor: data.primaryColor || initialColor,
+              backgroundColor: data.backgroundColor || initialBgColor,
               position: data.position || initialPosition,
               welcomeMessage: data.welcomeMessage || initialWelcome,
               chatWindowTitle: data.chatWindowTitle || initialTitle,
@@ -225,8 +228,8 @@ const ChatWidget = ({
   if (isLoading) return null;
 
   const content = (
-    <div className={`flex flex-col bg-[#0d0d1a] shadow-2xl transition-all duration-300 ${inline ? 'w-full h-full rounded-2xl' : 'rounded-2xl h-[520px] w-[380px]'}`}
-      style={{ border: `1px solid ${config.primaryColor}30` }}>
+    <div className={`flex flex-col shadow-2xl transition-all duration-300 ${inline ? 'w-full h-full rounded-2xl' : 'rounded-2xl h-[520px] w-[380px]'}`}
+      style={{ backgroundColor: config.backgroundColor, border: `1px solid ${config.primaryColor}30` }}>
       {/* Header */}
       <div className="px-4 py-3 flex items-center gap-3" style={{ backgroundColor: config.primaryColor }}>
         <div className="w-8 h-8 rounded-full bg-white/20 flex items-center justify-center">

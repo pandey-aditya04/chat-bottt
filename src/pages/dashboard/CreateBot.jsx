@@ -23,10 +23,10 @@ const CreateBot = () => {
     name: '', website: '', description: '',
     faqs: [{ question: '', answer: '' }],
     tone: 'Friendly', fallbackMessage: "I'm not sure about that. Please contact our support team.",
-    customInstructions: '', maxResponseLength: 'Medium',
-    primaryColor: '#6366f1', chatPosition: 'Right',
+    customInstructions: '', maxResponseLength: 'Medium', systemPrompt: '', model: 'gemini-flash-latest',
+    primaryColor: '#6366f1', backgroundColor: '#0d0d1a', chatPosition: 'Right',
     welcomeMessage: 'Hi! How can I help you today?', chatWindowTitle: 'Support Chat',
-    launcherIcon: 'Chat Bubble', avatar: null,
+    launcherIcon: 'Chat Bubble', logoUrl: '',
   });
   const [errors, setErrors] = useState({});
 
@@ -67,10 +67,11 @@ const CreateBot = () => {
       const bot = await addBot({
         name: form.name, website: form.website, description: form.description,
         faqs: form.faqs, status: 'Active', tone: form.tone,
-        fallbackMessage: form.fallbackMessage, primaryColor: form.primaryColor,
+        fallbackMessage: form.fallbackMessage, primaryColor: form.primaryColor, backgroundColor: form.backgroundColor,
         chatPosition: form.chatPosition, welcomeMessage: form.welcomeMessage,
-        chatWindowTitle: form.chatWindowTitle, launcherIcon: form.launcherIcon,
-        maxResponseLength: form.maxResponseLength,
+        chatWindowTitle: form.chatWindowTitle, launcherIcon: form.launcherIcon, logoUrl: form.logoUrl,
+        maxResponseLength: form.maxResponseLength, systemPrompt: form.systemPrompt || form.customInstructions,
+        model: form.model
       });
       toast.success('Bot published successfully! 🎉');
       navigate(`/dashboard/bots/${bot.id}/embed`);
@@ -207,8 +208,15 @@ const CreateBot = () => {
                   </div>
                   <Input label="Fallback Message" value={form.fallbackMessage} onChange={e => updateForm('fallbackMessage', e.target.value)} id="fallback" />
                   <div className="space-y-2">
-                    <label className="block text-xs font-black uppercase tracking-widest text-text-secondary">Custom Personality Instructions</label>
-                    <textarea value={form.customInstructions} onChange={e => updateForm('customInstructions', e.target.value)} placeholder="e.g. Be very helpful and always sign off with 'Have a great day!'" rows={3} className="w-full rounded-xl px-4 py-3 text-sm bg-surface-overlay border border-border text-text-primary placeholder-text-muted focus:outline-none focus:ring-2 focus:ring-brand/50 transition-all" />
+                    <label className="block text-xs font-black uppercase tracking-widest text-text-secondary">AI Model</label>
+                    <select value={form.model} onChange={e => updateForm('model', e.target.value)} className="w-full rounded-xl px-4 py-3 text-sm bg-surface-overlay border border-border text-text-primary focus:outline-none focus:ring-2 focus:ring-brand/50 transition-all appearance-none">
+                      <option value="gemini-flash-latest">Gemini Flash (Fast & Cheap)</option>
+                      <option value="gemini-pro-latest">Gemini Pro (Powerful & Accurate)</option>
+                    </select>
+                  </div>
+                  <div className="space-y-2">
+                    <label className="block text-xs font-black uppercase tracking-widest text-text-secondary">System Prompt (Persona & Rules)</label>
+                    <textarea value={form.systemPrompt} onChange={e => updateForm('systemPrompt', e.target.value)} placeholder="e.g. You are a helpful support agent for our SaaS product. Always be polite..." rows={4} className="w-full rounded-xl px-4 py-3 text-sm bg-surface-overlay border border-border text-text-primary placeholder-text-muted focus:outline-none focus:ring-2 focus:ring-brand/50 transition-all custom-scrollbar" />
                   </div>
                 </div>
               )}
@@ -217,11 +225,21 @@ const CreateBot = () => {
                 <div className="grid lg:grid-cols-2 gap-10">
                   <div className="space-y-6">
                     <h3 className="text-sm font-black uppercase tracking-widest text-text-primary">Appearance</h3>
-                    <div className="space-y-2">
-                      <label className="block text-xs font-black uppercase tracking-widest text-text-secondary">Brand Color</label>
-                      <div className="flex items-center gap-4 bg-surface-overlay p-3 rounded-xl border border-border">
-                        <input type="color" value={form.primaryColor} onChange={e => updateForm('primaryColor', e.target.value)} className="w-10 h-10 rounded-lg cursor-pointer border-0 bg-transparent" />
-                        <span className="text-sm font-mono font-bold tracking-wider">{form.primaryColor}</span>
+                    
+                    <div className="grid grid-cols-2 gap-4">
+                      <div className="space-y-2">
+                        <label className="block text-xs font-black uppercase tracking-widest text-text-secondary">Brand Color</label>
+                        <div className="flex items-center gap-4 bg-surface-overlay p-3 rounded-xl border border-border">
+                          <input type="color" value={form.primaryColor} onChange={e => updateForm('primaryColor', e.target.value)} className="w-10 h-10 rounded-lg cursor-pointer border-0 bg-transparent" />
+                          <span className="text-sm font-mono font-bold tracking-wider">{form.primaryColor}</span>
+                        </div>
+                      </div>
+                      <div className="space-y-2">
+                        <label className="block text-xs font-black uppercase tracking-widest text-text-secondary">Background</label>
+                        <div className="flex items-center gap-4 bg-surface-overlay p-3 rounded-xl border border-border">
+                          <input type="color" value={form.backgroundColor} onChange={e => updateForm('backgroundColor', e.target.value)} className="w-10 h-10 rounded-lg cursor-pointer border-0 bg-transparent" />
+                          <span className="text-sm font-mono font-bold tracking-wider">{form.backgroundColor}</span>
+                        </div>
                       </div>
                     </div>
                     <div className="space-y-2">
@@ -238,7 +256,7 @@ const CreateBot = () => {
                   <div className="relative">
                     <p className="text-[10px] font-black uppercase tracking-widest text-text-muted mb-4">Interface Preview</p>
                     <div className="sticky top-0 bg-surface-overlay rounded-3xl p-2 border border-border shadow-2xl">
-                      <ChatWidget faqs={form.faqs.filter(f => f.question && f.answer)} primaryColor={form.primaryColor} welcomeMessage={form.welcomeMessage} chatWindowTitle={form.chatWindowTitle} fallbackMessage={form.fallbackMessage} launcherIcon={form.launcherIcon} inline isDemo={true} />
+                      <ChatWidget faqs={form.faqs.filter(f => f.question && f.answer)} primaryColor={form.primaryColor} backgroundColor={form.backgroundColor} welcomeMessage={form.welcomeMessage} chatWindowTitle={form.chatWindowTitle} fallbackMessage={form.fallbackMessage} launcherIcon={form.launcherIcon} inline isDemo={true} />
                     </div>
                   </div>
                 </div>
@@ -252,7 +270,7 @@ const CreateBot = () => {
                   </div>
                   <div className="flex justify-center">
                     <div className="w-full max-w-sm bg-surface-overlay rounded-3xl p-2 border border-border shadow-2xl">
-                      <ChatWidget faqs={form.faqs.filter(f => f.question && f.answer)} primaryColor={form.primaryColor} position={form.chatPosition} welcomeMessage={form.welcomeMessage} chatWindowTitle={form.chatWindowTitle} fallbackMessage={form.fallbackMessage} launcherIcon={form.launcherIcon} inline isDemo={true} />
+                      <ChatWidget faqs={form.faqs.filter(f => f.question && f.answer)} primaryColor={form.primaryColor} backgroundColor={form.backgroundColor} position={form.chatPosition} welcomeMessage={form.welcomeMessage} chatWindowTitle={form.chatWindowTitle} fallbackMessage={form.fallbackMessage} launcherIcon={form.launcherIcon} inline isDemo={true} />
                     </div>
                   </div>
                 </div>

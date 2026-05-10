@@ -1,21 +1,30 @@
 import { createContext, useContext, useEffect, useState } from 'react';
 import { supabase } from '../lib/supabase';
+import api from '../lib/api';
 
 const AuthContext = createContext(null);
 
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(undefined); // undefined = still loading
   const [token, setToken] = useState(null);
+  const [billingStatus, setBillingStatus] = useState(null);
 
   useEffect(() => {
     // 1. Resolve initial session on mount
     supabase.auth.getSession().then(({ data: { session } }) => {
       if (session) {
-        setUser(session.user);
         setToken(session.access_token);
         localStorage.setItem('token', session.access_token);
+        // Fetch billing status
+        api.get('/billing/status').then(({ data }) => {
+          setUser({ ...session.user, ...data });
+          setBillingStatus(data);
+        }).catch(err => {
+          setUser(session.user);
+        });
       } else {
         setUser(null); // confirmed not logged in
+        setBillingStatus(null);
       }
     });
 
@@ -24,9 +33,14 @@ export const AuthProvider = ({ children }) => {
       console.log('[Auth Context Event]:', event, session?.user?.email);
       
       if (session) {
-        setUser(session.user);
         setToken(session.access_token);
         localStorage.setItem('token', session.access_token);
+        api.get('/billing/status').then(({ data }) => {
+          setUser({ ...session.user, ...data });
+          setBillingStatus(data);
+        }).catch(err => {
+          setUser(session.user);
+        });
       }
 
       if (event === 'TOKEN_REFRESHED' && session) {
@@ -37,6 +51,7 @@ export const AuthProvider = ({ children }) => {
       if (event === 'SIGNED_OUT') {
         setUser(null);
         setToken(null);
+        setBillingStatus(null);
         localStorage.removeItem('token');
         localStorage.removeItem('user');
       }
