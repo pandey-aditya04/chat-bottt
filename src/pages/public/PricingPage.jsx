@@ -1,8 +1,8 @@
 import { Check } from 'lucide-react';
-import Button from '../components/ui/Button';
-import FadeIn from '../components/ui/FadeIn';
-import api from '../lib/api';
-import { useAuth } from '../context/AuthContext';
+import Button from '../../components/ui/Button';
+import FadeIn from '../../components/ui/FadeIn';
+import api from '../../lib/api';
+import { useAuth } from '../../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
 
 const PricingPage = () => {
