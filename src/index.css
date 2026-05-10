@@ -25,9 +25,25 @@
   --color-text-muted: #475569;
 
   /* Standardized Radius */
-  --radius-2xl: 16px;
+  --radius-2xl: 1.5rem;
   --radius-xl: 12px;
   --radius-lg: 8px;
+  --radius-none: 0px;
+  --radius-xs: 0.125rem;
+  --radius-default: 0.375rem;
+  --radius-3xl: 1.875rem;
+  --radius-full: 9999px;
+  
+  --color-button-ripple-color: var(--button-ripple-color);
+}
+
+:root {
+  --button-ripple-color: oklch(0.145 0 0 / 0.3);
+}
+
+.dark {
+  --background: oklch(0.10 0 0);
+  --button-ripple-color: oklch(0.985 0 0 / 0.5);
 }
 
 @layer base {

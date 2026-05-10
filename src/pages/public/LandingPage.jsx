@@ -16,6 +16,9 @@ import { SpotlightHover } from '../../components/ui/spotlight-hover';
 import { Boxes } from '../../components/ui/background-boxes';
 import { FeaturesSection } from '../../components/ui/features-5';
 import { WavePath } from '../../components/ui/wave-path';
+import { ContainerScroll } from '../../components/ui/container-scroll-animation';
+import { PricingCard } from '../../components/ui/animated-glassy-pricing';
+import { RobotFlyby } from '../../components/ui/robot-flyby';
 import HeroFuturistic from '../../components/ui/hero-futuristic';
 import StickyFooter from '../../components/ui/footer';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -168,6 +171,34 @@ const LandingPage = () => {
         </div>
       </section>
 
+      {/* Immersive 3D Flyby */}
+      <section className="relative z-10 -mt-10 mb-10">
+        <RobotFlyby />
+      </section>
+
+      {/* Dashboard Preview with Scroll Animation */}
+      <section className="bg-surface overflow-hidden">
+        <ContainerScroll
+          titleComponent={
+            <div className="mb-10">
+              <h2 className="text-4xl md:text-5xl font-semibold gradient-text mb-4">
+                Monitor Everything in Real-Time
+              </h2>
+              <p className="text-text-secondary text-lg">
+                Get deep insights into your chatbot's performance and customer interactions.
+              </p>
+            </div>
+          }
+        >
+          <img
+            src="/chatbot_analytics_dashboard.png"
+            alt="Dashboard Analytics Preview"
+            className="w-full h-full object-cover object-left-top rounded-2xl"
+            draggable={false}
+          />
+        </ContainerScroll>
+      </section>
+
       {/* Features */}
       <section id="features" className="py-24 lg:py-32">
         <div className="max-w-6xl mx-auto px-6 md:px-12">
@@ -261,46 +292,24 @@ const LandingPage = () => {
         <div className="max-w-6xl mx-auto px-6 md:px-12">
           <div className="text-center mb-20">
             <FadeIn>
-              <h2 className="mb-4">Simple <span className="gradient-text">Pricing</span></h2>
+              <h2 className="mb-4">Simple <span className="text-cyan-400">Pricing</span></h2>
               <p className="text-text-secondary text-lg">Start free, upgrade as you grow</p>
             </FadeIn>
           </div>
 
-          <div className="grid md:grid-cols-3 gap-8">
+          <div className="flex flex-col md:flex-row gap-8 justify-center items-stretch">
             {pricingPlans.map((plan, i) => (
-              <FadeIn key={i} delay={i * 0.1} className={`relative p-8 rounded-2xl border transition-all duration-500 ${plan.highlight ? 'bg-surface-raised border-brand shadow-glow-brand ring-1 ring-brand/30' : 'bg-surface border-border hover:border-text-muted'}`}>
-                {plan.badge && (
-                  <div className="absolute -top-3.5 left-1/2 -translate-x-1/2 px-4 py-1 bg-brand text-[10px] font-black uppercase tracking-widest text-white rounded-full">
-                    {plan.badge}
-                  </div>
-                )}
-                <div className="mb-8">
-                  <h3 className="text-lg mb-2">{plan.name}</h3>
-                  <div className="flex items-baseline gap-1.5">
-                    <span className="text-4xl font-black">{plan.price}</span>
-                    <span className="text-sm text-text-secondary">{plan.period}</span>
-                  </div>
-                </div>
-                
-                <ul className="space-y-4 mb-10">
-                  {plan.features.map((f, fi) => (
-                    <li key={fi} className="flex items-start gap-3 text-sm">
-                      <div className="mt-1 w-4 h-4 rounded-full bg-success/20 flex items-center justify-center flex-shrink-0">
-                        <Check className="w-2.5 h-2.5 text-success" />
-                      </div>
-                      <span className="text-text-secondary">{f}</span>
-                    </li>
-                  ))}
-                </ul>
-
-                <LiquidButton 
-                  onClick={() => navigate('/signup')} 
-                  variant={plan.highlight ? 'default' : 'secondary'}
-                  className="w-full py-6"
-                >
-                  {plan.cta}
-                </LiquidButton>
-              </FadeIn>
+              <PricingCard
+                key={i}
+                planName={plan.name}
+                description={plan.description}
+                price={plan.price.replace('$', '')}
+                features={plan.features}
+                buttonText={plan.cta}
+                isPopular={plan.highlight}
+                buttonVariant={plan.highlight ? 'primary' : 'secondary'}
+                onClick={() => navigate('/signup')}
+              />
             ))}
           </div>
         </div>

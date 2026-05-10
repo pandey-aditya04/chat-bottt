@@ -20,6 +20,7 @@ import {
   mix,
   add
 } from 'three/tsl';
+import { TextScramble } from './text-scramble';
 
 extend(THREE as any);
 
@@ -118,17 +119,16 @@ export const HeroFuturistic = ({ onExplore }: { onExplore?: () => void }) => {
         <div className="text-4xl md:text-6xl xl:text-7xl 2xl:text-8xl font-black text-center max-w-5xl tracking-tighter drop-shadow-[0_4px_8px_rgba(0,0,0,0.8)]">
           <div className="flex flex-wrap justify-center gap-x-4 gap-y-2 text-white">
             {titleWords.map((word, index) => (
-              <div
+              <TextScramble
                 key={index}
-                className="transition-all duration-1000 ease-out"
-                style={{ 
-                  animationDelay: `${index * 0.13 + (delays[index] || 0)}s`, 
-                  opacity: index < visibleWords ? 1 : 0,
-                  transform: index < visibleWords ? 'translateY(0)' : 'translateY(20px)'
-                }}
+                className={word === 'Chatbots' ? 'bg-gradient-to-r from-brand to-accent bg-clip-text text-transparent' : 'text-white'}
+                as="div"
+                trigger={index < visibleWords}
+                duration={0.8}
+                speed={0.05}
               >
-                {word === 'Chatbots' ? <span className="bg-gradient-to-r from-brand to-accent bg-clip-text text-transparent drop-shadow-none">{word}</span> : word}
-              </div>
+                {word}
+              </TextScramble>
             ))}
           </div>
         </div>

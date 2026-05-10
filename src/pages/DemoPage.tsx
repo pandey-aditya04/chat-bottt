@@ -8,6 +8,7 @@ import { FeaturesSection } from "@/components/ui/features-5";
 import { WavePath } from "@/components/ui/wave-path";
 import HeroFuturistic from "@/components/ui/hero-futuristic";
 import StickyFooter from "@/components/ui/footer";
+import AIMessageBar from "@/components/ui/ai-assistat";
 import { cn } from "@/lib/utils";
 
 export function WhobeeDemo() {
@@ -148,6 +149,11 @@ export default function DemoPage() {
             <p className="text-text-secondary animate-bounce">Scroll down to reveal the sticky footer ↓</p>
         </div>
         <StickyFooter />
+      </section>
+
+      <section className="w-full max-w-5xl">
+        <h2 className="text-xl text-zinc-500 mb-4">AI Assistant Interface</h2>
+        <AIMessageBar />
       </section>
 
       <section className="flex flex-col items-center gap-8">
