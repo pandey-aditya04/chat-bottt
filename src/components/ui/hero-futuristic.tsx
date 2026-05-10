@@ -23,7 +23,6 @@ import {
   normalLocal
 } from 'three/tsl';
 import { TextScramble } from './text-scramble';
-import { BoxesCore } from './background-boxes';
 
 extend(THREE as any);
 
@@ -146,10 +145,7 @@ export const HeroFuturistic = ({ onExplore }: { onExplore?: () => void }) => {
   }, [visibleWords, titleWords.length]);
 
   return (
-    <div className="relative h-svh w-full overflow-hidden bg-slate-900">
-      <div className="absolute inset-0 z-0 pointer-events-none opacity-40">
-        <BoxesCore />
-      </div>
+    <div className="relative h-svh w-full overflow-hidden bg-black">
       {/* Subtle dark gradient overlay to ensure text contrast against the bright 3D model */}
       <div className="absolute inset-0 z-10 flex flex-col items-center justify-center pointer-events-none px-6 md:px-12 bg-[radial-gradient(ellipse_at_center,rgba(0,0,0,0.65)_0%,transparent_70%)]">
         <div className="text-4xl md:text-6xl xl:text-7xl 2xl:text-8xl font-black text-center max-w-5xl tracking-tighter drop-shadow-[0_4px_8px_rgba(0,0,0,0.8)]">
@@ -216,7 +212,6 @@ export const HeroFuturistic = ({ onExplore }: { onExplore?: () => void }) => {
         >
           <Suspense fallback={null}>
             <PostProcessing fullScreenEffect={true} strength={0.4} threshold={0.8} />
-            <Scene />
           </Suspense>
         </Canvas>
       </ErrorBoundary>

@@ -18,8 +18,6 @@ import { FeaturesSection } from '../../components/ui/features-5';
 import { WavePath } from '../../components/ui/wave-path';
 import { ContainerScroll } from '../../components/ui/container-scroll-animation';
 import { PricingCard } from '../../components/ui/animated-glassy-pricing';
-import { RobotFlyby } from '../../components/ui/robot-flyby';
-import { DottedSurface } from '../../components/ui/dotted-surface';
 import HeroFuturistic from '../../components/ui/hero-futuristic';
 import StickyFooter from '../../components/ui/footer';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -63,8 +61,6 @@ const LandingPage = () => {
         <meta property="og:description" content="Build AI Chatbots your visitors actually talk to. Transform your static FAQ into an interactive assistant." />
       </Helmet>
       
-      <DottedSurface />
-
       {/* Navigation */}
       <nav className={`fixed top-0 w-full z-50 ${isDark ? 'bg-surface/80' : 'bg-surface/80'} backdrop-blur-xl border-b border-border`}>
         <div className="max-w-6xl mx-auto px-6 md:px-12">
@@ -178,11 +174,6 @@ const LandingPage = () => {
             ))}
           </div>
         </div>
-      </section>
-
-      {/* Immersive 3D Flyby */}
-      <section className="relative z-10 -mt-10 mb-10">
-        <RobotFlyby />
       </section>
 
       {/* Dashboard Preview with Scroll Animation */}
